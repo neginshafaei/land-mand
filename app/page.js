@@ -8,11 +8,15 @@ export default function Home() {
   useEffect(() => {
     fetch("/api/lands")
       .then((res) => res.json())
-      .then((data) => setLands(data));
+      .then((data) => {
+        const sorted = [...data].sort((a, b) => a.y - b.y || a.x - b.x);
+        setLands(sorted);
+      });
   }, []);
 
   useEffect(() => {
     const tg = window.Telegram?.WebApp;
+
     if (tg) {
       tg.ready();
       tg.expand();
@@ -27,14 +31,15 @@ export default function Home() {
     }
   }, []);
 
-  async function buyLand(landId) {
+  async function buyLand(x, y) {
     const res = await fetch("/api/buy-land", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        landId,
+        x,
+        y,
         userId: userData.id,
       }),
     });
@@ -43,10 +48,19 @@ export default function Home() {
 
     if (data.error) {
       alert(data.error);
-    } else {
-      alert("Land purchased!");
-      location.reload();
+      return;
     }
+
+    setLands((prev) =>
+      prev.map((l) =>
+        l.x === x && l.y === y ? { ...l, owner_id: userData.id } : l
+      )
+    );
+
+    setUserData((prev) => ({
+      ...prev,
+      balance: prev.balance - data.price,
+    }));
   }
 
   if (!userData) return <div style={{ color: "white" }}>Loading...</div>;
@@ -54,12 +68,14 @@ export default function Home() {
   return (
     <main style={{ padding: "20px", textAlign: "center" }}>
       <h1>Hi {userData.first_name}!</h1>
+
       <div
         style={{ background: "#222", padding: "20px", borderRadius: "15px" }}
       >
-        <p>Current Ballance:</p>
+        <p>Current Balance:</p>
         <h2 style={{ color: "#00d1ff" }}>{userData.balance} Coins 🪙</h2>
       </div>
+
       <button
         style={{
           marginTop: "20px",
@@ -73,6 +89,7 @@ export default function Home() {
       >
         All Lands
       </button>
+
       <div
         style={{
           display: "grid",
@@ -84,8 +101,8 @@ export default function Home() {
       >
         {lands.map((land) => (
           <div
-            key={land.id}
-            onClick={() => buyLand(land.id)}
+            key={`${land.x}-${land.y}`}
+            onClick={() => buyLand(land.x, land.y)}
             style={{
               width: 20,
               height: 20,

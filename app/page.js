@@ -27,6 +27,28 @@ export default function Home() {
     }
   }, []);
 
+  async function buyLand(landId) {
+    const res = await fetch("/api/buy-land", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        landId,
+        userId: userData.id,
+      }),
+    });
+
+    const data = await res.json();
+
+    if (data.error) {
+      alert(data.error);
+    } else {
+      alert("Land purchased!");
+      location.reload();
+    }
+  }
+
   if (!userData) return <div style={{ color: "white" }}>Loading...</div>;
 
   return (
@@ -63,10 +85,12 @@ export default function Home() {
         {lands.map((land) => (
           <div
             key={land.id}
+            onClick={() => buyLand(land.id)}
             style={{
               width: 20,
               height: 20,
               backgroundColor: land.owner_id ? "gold" : "#ddd",
+              cursor: "pointer",
             }}
           />
         ))}

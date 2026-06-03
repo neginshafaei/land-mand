@@ -3,6 +3,13 @@ import { useEffect, useState } from "react";
 
 export default function Home() {
   const [userData, setUserData] = useState(null);
+  const [lands, setLands] = useState([]);
+
+  useEffect(() => {
+    fetch("/api/lands")
+      .then((res) => res.json())
+      .then((data) => setLands(data));
+  }, []);
 
   useEffect(() => {
     const tg = window.Telegram?.WebApp;
@@ -20,8 +27,7 @@ export default function Home() {
     }
   }, []);
 
-  if (!userData)
-    return <div style={{ color: "white" }}>Loading...</div>;
+  if (!userData) return <div style={{ color: "white" }}>Loading...</div>;
 
   return (
     <main style={{ padding: "20px", textAlign: "center" }}>
@@ -45,6 +51,26 @@ export default function Home() {
       >
         All Lands
       </button>
+      <div
+        style={{
+          display: "grid",
+          gridTemplateColumns: "repeat(20, 20px)",
+          gap: "2px",
+          marginTop: "30px",
+          justifyContent: "center",
+        }}
+      >
+        {lands.map((land) => (
+          <div
+            key={land.id}
+            style={{
+              width: 20,
+              height: 20,
+              backgroundColor: land.owner_id ? "gold" : "#ddd",
+            }}
+          />
+        ))}
+      </div>
     </main>
   );
 }

@@ -3,6 +3,7 @@ import { verifyTelegramData } from "@/lib/telegram";
 import { createSupabaseAdmin } from "@/lib/supabaseAdmin";
 
 const supabase = createSupabaseAdmin();
+const STARTING_BALANCE = 1000;
 
 async function upsertUserProfile(profile) {
   const { data: existingUser, error: existingError } = await supabase
@@ -20,7 +21,7 @@ async function upsertUserProfile(profile) {
         id: profile.id,
         username: profile.username,
         first_name: profile.first_name,
-        balance: profile.balance || 0,
+        balance: profile.balance ?? STARTING_BALANCE,
         last_claim: new Date().toISOString(),
       })
       .select()

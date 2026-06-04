@@ -234,10 +234,10 @@ async function bootApp() {
       tg.expand();
     }
 
-    const [landsData, authData] = await Promise.all([
-      fetchJson("/api/lands"),
-      postJson("/api/auth", { initData: tg?.initData || null }),
-    ]);
+    const authData = await postJson("/api/auth", {
+      initData: tg?.initData || null,
+    });
+    const landsData = await fetchJson("/api/lands");
 
     return { authData, landsData };
   } catch (error) {

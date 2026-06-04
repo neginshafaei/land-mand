@@ -1,8 +1,10 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #101115;
+  --foreground: #f4f0e8;
+  --font-geist-sans: Arial, Helvetica, sans-serif;
+  --font-geist-mono: "Courier New", Consolas, monospace;
 }
 
 @theme inline {
@@ -12,15 +14,72 @@
   --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+* {
+  box-sizing: border-box;
+}
+
+html {
+  min-height: 100%;
 }
 
 body {
-  background: var(--background);
+  background:
+    linear-gradient(120deg, rgba(82, 210, 115, 0.08), transparent 34%),
+    linear-gradient(230deg, rgba(245, 165, 36, 0.1), transparent 30%),
+    #101115;
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-geist-sans);
+  margin: 0;
+}
+
+.loadingMark {
+  animation: pulseMark 1.2s ease-in-out infinite alternate;
+  background:
+    linear-gradient(90deg, #52d273, #20b7e8) padding-box,
+    linear-gradient(135deg, #52d273, #f5a524) border-box;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  height: 54px;
+  width: 54px;
+}
+
+.coinPulse {
+  animation: coinPulse 1.8s ease-in-out infinite;
+  background: #f8d47a;
+  border-radius: 999px;
+  box-shadow: 0 0 16px rgba(248, 212, 122, 0.85);
+  height: 8px;
+  left: 50%;
+  position: absolute;
+  top: 42%;
+  width: 8px;
+  z-index: 1;
+}
+
+@keyframes pulseMark {
+  from {
+    opacity: 0.55;
+    transform: scale(0.92);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes coinPulse {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, 10px) scale(0.75);
+  }
+
+  35% {
+    opacity: 1;
+  }
+
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -18px) scale(1.2);
+  }
 }

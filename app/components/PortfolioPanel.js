@@ -17,25 +17,33 @@ export default function PortfolioPanel({
   onUpgrade,
 }) {
   return (
-    <section className="rounded-lg border border-white/10 bg-white/[0.06] p-4 shadow-2xl">
-      <SectionTitle eyebrow="Portfolio" title="Your lands" meta={`${hourlyIncome}/h`} />
-      <div className="grid gap-3">
-        {lands.slice(0, 8).map((land) => (
-          <LandCard
-            busy={busy}
-            key={land.id}
-            land={land}
-            lastClaim={lastClaim}
-            onCancelListing={onCancelListing}
-            onList={onList}
-            onUpgrade={onUpgrade}
-          />
-        ))}
-        {lands.length === 0 ? (
-          <p className="m-0 rounded-lg border border-dashed border-white/15 p-4 text-slate-400">
-            No owned lands yet.
-          </p>
-        ) : null}
+    <section className="rounded-2xl border border-white/10 bg-slate-950/50 backdrop-blur-xl p-6 shadow-2xl">
+      <div className="mb-6 flex items-end justify-between">
+        <SectionTitle eyebrow="Real Estate" title="Your Holdings" />
+        <div className="flex flex-col items-end">
+          <span className="text-[10px] font-bold uppercase tracking-widest text-slate-500">Total Yield</span>
+          <span className="text-xl font-black text-emerald-400">+{hourlyIncome}<span className="text-sm font-medium opacity-60">/h</span></span>
+        </div>
+      </div>
+
+      <div className="grid gap-4">
+        {lands.length > 0 ? (
+          lands.slice(0, 8).map((land) => (
+            <LandCard
+              busy={busy}
+              key={land.id}
+              land={land}
+              lastClaim={lastClaim}
+              onCancelListing={onCancelListing}
+              onList={onList}
+              onUpgrade={onUpgrade}
+            />
+          ))
+        ) : (
+          <div className="flex flex-col items-center justify-center py-12 px-4 rounded-xl border border-dashed border-white/10 bg-white/[0.02]">
+            <p className="text-slate-400 text-sm italic">No lands discovered in your portfolio yet.</p>
+          </div>
+        )}
       </div>
     </section>
   );
@@ -49,66 +57,99 @@ function LandCard({ busy, land, lastClaim, onCancelListing, onList, onUpgrade })
   const productionWidth = Math.min(100, Math.max(8, (effectiveIncome / 60) * 100));
 
   return (
-    <article className="grid grid-cols-[5px_1fr] gap-3 overflow-hidden rounded-lg border border-white/10 bg-white/[0.055] p-3">
-      <div className="rounded-full" style={{ background: meta.color }} />
-      <div>
-        <div className="flex items-center justify-between gap-3">
-          <strong className="text-stone-50">{land.rarity}</strong>
-          <span className="font-mono text-xs text-slate-400">
-            {land.x}, {land.y}
+    <article className="group relative overflow-hidden rounded-xl border border-white/5 bg-white/[0.03] p-4 transition-all hover:bg-white/[0.06] hover:shadow-lg">
+      {/* Rarity Accent Glow */}
+      <div 
+        className="absolute left-0 top-0 h-full w-[4px] opacity-70"
+        style={{ background: meta.color, boxShadow: `2px 0 10px ${meta.color}44` }} 
+      />
+
+      <div className="flex flex-col gap-4">
+        {/* Top Row: Rarity & Coordinates */}
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <span 
+              className="rounded-md px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-white"
+              style={{ backgroundColor: `${meta.color}33`, color: meta.color, border: `1px solid ${meta.color}44` }}
+            >
+              {land.rarity}
+            </span>
+            <span className="text-[10px] font-medium text-slate-500">LVL {land.level}</span>
+          </div>
+          <span className="font-mono text-[10px] text-slate-500 group-hover:text-slate-300 transition-colors">
+            LOC: {land.x}, {land.y}
           </span>
         </div>
-        <div className="my-3 rounded-lg border border-emerald-300/15 bg-black/20 p-3">
-          <div className="flex items-center justify-between gap-3">
-            <span className="text-xs font-black uppercase text-emerald-300">
-              Coin production
-            </span>
-            <strong className="text-lg text-amber-200">
-              +{effectiveIncome}/h
-            </strong>
+
+        {/* Main Stats Area */}
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+          <div>
+            <div className="flex items-baseline gap-1">
+              <span className="text-2xl font-black text-white">{effectiveIncome}</span>
+              <span className="text-xs font-bold text-emerald-400">COINS / HR</span>
+            </div>
+            {/* Progress Bar */}
+            <div className="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-white/5">
+              <div
+                className="h-full rounded-full bg-gradient-to-r from-emerald-500 to-amber-400 transition-all duration-1000"
+                style={{ width: `${productionWidth}%` }}
+              />
+            </div>
           </div>
-          <div className="mt-2 h-2 overflow-hidden rounded-full bg-white/10">
-            <div
-              className="h-full rounded-full bg-gradient-to-r from-emerald-300 to-amber-300"
-              style={{ width: `${productionWidth}%` }}
-            />
-          </div>
-          <div className="mt-2 grid gap-1 text-xs text-slate-300 sm:grid-cols-3">
-            <span>Base: {land.income_per_hour}/h</span>
-            <span>Level: x{multiplier.toFixed(1)}</span>
-            <span>Unclaimed: {formatCoins(pendingIncome)}</span>
+
+          <div className="flex justify-between items-center bg-black/20 rounded-lg p-2 px-3 border border-white/5">
+             <div className="text-center">
+                <p className="text-[9px] uppercase text-slate-500 font-bold">Multiplier</p>
+                <p className="text-xs font-mono text-slate-200">x{multiplier.toFixed(1)}</p>
+             </div>
+             <div className="h-6 w-[1px] bg-white/10" />
+             <div className="text-right">
+                <p className="text-[9px] uppercase text-slate-500 font-bold">Unclaimed</p>
+                <p className="text-xs font-mono text-amber-200">{formatCoins(pendingIncome)}</p>
+             </div>
           </div>
         </div>
-        {land.for_sale ? (
-          <p className="mb-2 mt-0 rounded border border-amber-300/30 bg-amber-300/10 px-2 py-1 text-sm font-bold text-amber-100">
-            Listed for {land.sale_price} Coins
-          </p>
-        ) : null}
-        <div className="flex items-center gap-2.5">
-          <button
-            className="min-h-8 rounded-lg border border-white/10 bg-white/10 px-3 py-2 text-sm font-black text-white disabled:cursor-not-allowed disabled:opacity-55"
-            disabled={busy}
-            onClick={() => onUpgrade(land.id)}
-          >
-            Upgrade
-          </button>
-          {land.for_sale ? (
+
+        {/* Sales Status / Actions */}
+        <div className="flex items-center justify-between border-t border-white/5 pt-3">
+          <div className="flex-1">
+            {land.for_sale ? (
+              <div className="flex items-center gap-2">
+                <div className="h-1.5 w-1.5 animate-pulse rounded-full bg-amber-400" />
+                <span className="text-xs font-bold text-amber-200/80">Listed: {land.sale_price} Coins</span>
+              </div>
+            ) : (
+              <span className="text-[10px] font-bold uppercase text-slate-600">Active Production</span>
+            )}
+          </div>
+
+          <div className="flex gap-2">
             <button
-              className="min-h-8 rounded-lg border border-white/10 bg-white/10 px-3 py-2 text-sm font-black text-white disabled:cursor-not-allowed disabled:opacity-55"
               disabled={busy}
-              onClick={() => onCancelListing(land.id)}
+              onClick={() => onUpgrade(land.id)}
+              className="rounded-md bg-white/10 px-4 py-1.5 text-xs font-bold text-white transition-all hover:bg-white/20 active:scale-95 disabled:opacity-30"
             >
-              Cancel
+              Upgrade
             </button>
-          ) : (
-            <button
-              className="min-h-8 rounded-lg border border-white/10 bg-white/10 px-3 py-2 text-sm font-black text-white disabled:cursor-not-allowed disabled:opacity-55"
-              disabled={busy}
-              onClick={() => onList(land.id)}
-            >
-              Sell
-            </button>
-          )}
+            
+            {land.for_sale ? (
+              <button
+                disabled={busy}
+                onClick={() => onCancelListing(land.id)}
+                className="rounded-md bg-red-500/10 border border-red-500/20 px-4 py-1.5 text-xs font-bold text-red-400 transition-all hover:bg-red-500/20 active:scale-95 disabled:opacity-30"
+              >
+                Cancel
+              </button>
+            ) : (
+              <button
+                disabled={busy}
+                onClick={() => onList(land.id)}
+                className="rounded-md border border-white/10 bg-transparent px-4 py-1.5 text-xs font-bold text-slate-300 transition-all hover:bg-white/10 hover:text-white active:scale-95 disabled:opacity-30"
+              >
+                Sell
+              </button>
+            )}
+          </div>
         </div>
       </div>
     </article>

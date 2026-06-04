@@ -4,7 +4,7 @@ create table if not exists public.users (
   id bigint primary key,
   username text,
   first_name text,
-  balance integer not null default 0,
+  balance integer not null default 1000,
   last_claim timestamptz not null default now(),
   created_at timestamptz not null default now()
 );
@@ -33,9 +33,12 @@ create index if not exists lands_for_sale_idx on public.lands(for_sale) where fo
 alter table public.users
   add column if not exists username text,
   add column if not exists first_name text,
-  add column if not exists balance integer not null default 0,
+  add column if not exists balance integer not null default 1000,
   add column if not exists last_claim timestamptz not null default now(),
   add column if not exists created_at timestamptz not null default now();
+
+alter table public.users
+  alter column balance set default 1000;
 
 alter table public.lands
   add column if not exists rarity text not null default 'Common',
